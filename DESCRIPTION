@@ -1,0 +1,35 @@
+Package: dames
+Title: Design and Analysis Methods for Efficient Studies with Binary Correlated Outcome
+Version: 0.0.0.9000
+Authors@R: 
+    c(person(given = "Chiara",
+           family = "Di Gravio",
+           role = c("aut", "cre"),
+           email = "chiara.di.gravio@vanderbilt.edu"),
+      person(given = "Nathaniel",
+           family = "Mercaldo",
+           role = c("aut"),
+           email = "nmercaldo@mgh.harvard.edu"),
+      person(given = "Ran",
+           family = "Tao",
+           role = c("aut"),
+           email = "r.tao@vumc.org"),
+      person(given = "Jonathan S",
+           family = "Schildcrout",
+           role = c("aut"),
+           email = "jonny.schild@vumc.org"))
+Description: Design and analysis methods for cost and resource efficient epidemiological studies designs with binary correlated outcomes.
+             Methods are described in Schildcrout and Heagerty (2008) <doi:10.1093/biostatistics/kxn006>, Schildcrout et al (2015) <dai:10.1214/15-AOAS826>.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 3.5.0)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
+Imports: stats, binaryMM, dplyr, magrittr, fastGHQuad, mitools, MASS
+Suggests: 
+    rmarkdown,
+    knitr, 
+    tidyverse,
+    viridis
+VignetteBuilder: knitr
