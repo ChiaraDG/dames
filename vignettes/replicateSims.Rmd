@@ -1,0 +1,192 @@
+---
+title: "How to Replicate the Results in _Efficient Designs and Analysis of Two-Phase Studies with Longitudinal Binary Data_ by Di Gravio, Schildcrout, Tao (2023)"
+author: "Chiara Di Gravio"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to Replicate the Results in _Efficient Designs and Analysis of Two-Phase Studies with Longitudinal Binary Data_ by Di Gravio, Schildcrout, Tao (2023)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The vignette shows how to replicate the results presented in _"Efficient Designs and Analysis of Two-Phase Studies with Longitudinal Binary Data"_ by Di Gravio, Schildcrout and Tao (2023). 
+
+The data used for the simulation studies summarized in Section 5 were generated using the following function:
+
+```{r, eval = FALSE}
+datGen <- function(betas, gammas, sigmas, N, nclust, ni, alpha0 = NULL, 
+                   alpha1 = NULL,
+                   xtype = "binary"){
+  
+  id       <-  sort(rep(seq(N), nclust))
+  # binary X and Z
+  if(xtype == "binary"){
+     Z     <-  rbinom(n = N, size = 1, prob = 0.3)
+     logod <-  alpha0 + alpha1*Z
+     pX    <-  expit(logod)
+     X     <- rbinom(n = N, size = 1, prob = pX)
+  } else {
+     Z    <-  rnorm(n = N)
+     X    <-  rnorm(n = N, mean = -0.5 - alpha1*Z, sd = 1)
+  }
+  time <-  rep(c(0:(nclust-1)), N)
+  Z    <- rep(Z, each = nclust)
+  X    <- rep(X, each = nclust)
+  dat  <- data.frame(id, X, Z, time)
+
+  # generate y: transition model without Z*time interaction
+  y    <- binaryMM::GenBinaryY(mean.formula= ~ X + time + Z + X:time,
+                           t.formula = ~1, lv.formula = NULL, 
+                           beta = betas, gamma = gammas,
+                           sigma = sigmas, id = id, data = dat,
+                           q = 20)
+  dat <- data.frame(dat, Y = y)
+  # generate balanced and incomplete data
+  droptime <- rep(sample(seq(ni[1], ni[2]), N, replace=TRUE), each=ni[2]) - 1
+  dat        <- dat[dat$time<=droptime,]
+  dat
+}
+```
+
+Note that the function requires users to load the `binaryMM` package in order to simulate the longitudinal binary outcome. There is no need to load the `dames` package to generate the data. 
+
+**Simulation 1: Binary Expensive Exposure and Inexpensive Covariate**
+
+```{r, eval = FALSE}
+###### SMALL CLUSTER SIZE SCENARIO ######
+# set up the parameters
+params      <- c(-2.95, 0.25, 0.15, 1.5, 0.15, 2) 
+N.sim       <- 2000
+ni.sim      <- c(3, 6)
+nclust.sim  <- max(ni.sim)
+n_sieve     <- 10
+betas       <- params[1:5]
+gamma       <- params[6]
+sigma       <- NULL
+# a) correlated exposure and covariate
+dat.1a    <- datGen(betas = betas, gammas = gamma, sigmas = sigma, 
+                    ni = ni.sim, N = N.sim, nclust = nclust.sim,
+                    alpha0 = -2.20, alpha1 = 2, xtype = "binary")
+
+# b) independent exposure and covariate
+dat.1b    <- datGen(betas = betas, gammas = gamma, sigmas = sigma, 
+                    ni = ni.sim, N = N.sim, nclust = nclust.sim,
+                    alpha0 = -1.35, alpha1 = 0, xtype = "binary")
+
+```
+
+**Simulation 2: Continuous Expensive Exposure and Inexpensive Covariate**
+
+```{r, eval = FALSE}
+###### SMALL CLUSTER SIZE SCENARIO ######
+# set up the parameters
+params      <- c(-2.5, 0.5, 0.15, 1.5, 0.15, 2)
+N.sim       <- 1000
+ni.sim      <- c(3, 6)
+nclust.sim  <- max(ni.sim)
+n.rand      <- 200
+
+# a) correlated exposure and covariate
+dat.2a    <- datGen(betas = betas, gammas = gamma, sigmas = sigma, 
+                    ni = ni.sim, N = N.sim, nclust = nclust.sim, alpha1 = 0.2,
+                    xtype = "continuous")
+```
+
+## Set-Up the Design
+
+The paper compares none-some-all (NSA) designs and residual dependent sampling (RDS) designs. Both NSA and RDS designs can be implemented using functions in the `dames` package. Below is an example on how to perform NSA[10,480,10] and vR[600]:
+
+```{r, eval = FALSE}
+###### NSA DESIGN ######
+nsa       <- dames::nsa_design(Y = "Y", id = "id", 
+                               n.sample = c(10, 480, 10), data = dat.1a)
+# set as missing the value of the expensive exposure X for subjects not sampled
+dat.nsa   <- dat.1a
+dat.nsa$X <- ifelse(dat.nsa$id %in% nsa$sampled.id, dat.nsa$X, NA)
+
+###### RDS DESIGN ######
+rds <- dames::res_design(Y = "Y", id = "id", 
+                  mean.formula = Y ~ Z + time, t.formula = ~1, lv.formula = NULL,
+                  n.sample = 600, statistic = "variance", data = dat.1a)
+# set as missing the value of the expensive exposure X for subjects not sampled
+dat.rds   <- dat.1a
+dat.rds$X <- ifelse(dat.rds$id %in% rds$sampled.id, dat.rds$X, NA)
+```
+
+To implement a different NSA design, users can change the values of `n.sample` in the `nsa_design` call function. For instance, the NSA[0, 500, 0] design can be carried out by setting `n.sample = c(0, 500, 0)`. 
+
+Similarly, one can implement a different RDS design by changing one input of the `res.design` function. Users can select `statistic = mean` for a mR[300, 300] design or `statistic = abs.mean` for a abs.mR[600] design.
+
+
+## Running Estimator Code
+
+Inference methods can be divided into two groups: methods that only include subjects with complete data on outcome, expensive exposure and inexpensive covariates (complete-case analyses), and methods that include all subjects regardless of whether they have information on the expensive exposure (full-cohort analyses). Below, we provide the code needed to replicate the results from the analyses presented in the paper.
+
+**Ascertainment Corrected Maximum Likelihood (ACML) Estimator**
+
+The estimated coefficients and standard errors can be estimated using the `mod.acml1` function. The function below refers to the NSA[10, 480, 10] design. If one is interested in a NSA[0,500,0] design, then the input of `samp.probs` should be changed into `c(0, 500/655, 0)`. The function call will be the same regardless on whether the expensive exposure and the inexpensive covariate are binary or continuous.
+
+```{r, eval = FALSE}
+# Simulation 1 binary covariates - small sample size
+mod.acml1    <- dames::acml_mm(mean.formula = Y ~ X + time + Z + X:time,
+                               t.formula = ~1, id = id, 
+                               samp.probs = c(10/1325, 480/655, 10/25),
+                               data = dat.nsa)
+```
+
+**Multiple Imputation**
+
+The estimated coefficients and standard errors can be estimated using the `mod.acml1` function. The function below refers to the NSA[10, 480, 10] design. If one is interested in a NSA[0,500,0] design, then the input of `samp.probs` should be changed into `c(0, 500/655, 0)`. Note that the multiple imputation function cannot be used if the expensive exposure is continuous. 
+
+```{r, eval = FALSE}
+# define an indicator variable for sampling
+dat.na$Sampled <- ifelse(dat.nsa$id %in% nsa$sampled.id, 1, 0)
+# Simulation 1 - small sample size
+mod.mi <- dames::mi_mm(mean.formula = Y ~ X + time + Z + X:time,
+                 t.formula = ~1,
+                 lv.formula = NULL, id = "id", X = "X",
+                 sampled = "Sampled",
+                 data = dat.nsa,
+                 samp.probs = c(10/1325, 480/655, 10/25),
+                 marg.exp.formula = X ~ Z, M = 5, method = "indirect")
+```
+
+**Sieve Maximum Likelihood Estimator (SMLE)**
+
+```{r,eval = FALSE}
+# Simulation 1 binary covariates - small sample size
+# set up P(X|Z)
+Bspline_Z <- cbind(as.numeric(dat.nsa$Z == 0), as.numeric(dat.nsa$Z == 1))
+n_sieve             <- ncol(Bspline_Z)
+colnames(Bspline_Z) <- paste("bs", 1:n_sieve, sep="")
+exampledat          <- cbind(exampledat, Bspline_Z)
+# estimate the parameters using SMLE
+mod.smle <- smle_mm(mean.formula = Y ~ X + time + Z + X:time,
+                    t.formula = ~1, lv.formula = NULL,
+                    Y = "Y", X = "X", Z = "Z", Time = "time",
+                    id = "id", Bspline = Bspline_Z, n_sieve = n_sieve, 
+                    no_SE = FALSE,
+                    data = dat.nsa)
+
+# Simulation 2 continuous covariates - small sample size
+# set up P(X|Z)
+n_sieve               <- 10
+Bspline_Z             <- bs(dat.nsa$Z, df = n_sieve, degree = 1,
+                            Boundary.knots = range(dat.nsa$Z), intercept = TRUE)
+colnames(Bspline_Z)   <- paste0("bs", 1:n_sieve)
+dat.nsa                <- cbind(dat.nsa, Bspline_Z)
+# estimate the parameters using SMLE
+mod.smle <- smle_mm(mean.formula = Y ~ X + time + Z + X:time,
+                    t.formula = ~1, lv.formula = NULL,
+                    Y = "Y", X = "X", Z = "Z", Time = "time",
+                    id = "id", Bspline = Bspline_Z, n_sieve = n_sieve, 
+                    no_SE = FALSE,
+                    data = dat.nsa)
+```
