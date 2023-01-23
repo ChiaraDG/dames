@@ -19,10 +19,11 @@ Authors@R:
            role = c("aut"),
            email = "jonny.schild@vumc.org"))
 Description: Design and analysis methods for cost and resource efficient epidemiological studies designs with binary correlated outcomes.
-             Methods are described in Schildcrout and Heagerty (2008) <doi:10.1093/biostatistics/kxn006>, Schildcrout et al (2015) <dai:10.1214/15-AOAS826>.
+             Methods are described in Schildcrout and Heagerty (2008) <doi:10.1093/biostatistics/kxn006>, Schildcrout et al (2015) <doi:10.1214/15-AOAS826>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Language: en-US
 Depends: R (>= 3.5.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0

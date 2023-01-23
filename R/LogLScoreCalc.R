@@ -2,7 +2,7 @@
 #'
 #' @param params  Vector of parameters from the marginal mean and the dependence model parameters
 #' @param subjectData List of lists with subject-specific data
-#' @param ParamLengths Vector of three elements: the number of parameters in the marginal mean model, the number of parameters for the transition component of the dependence model, the number of paramters for the dependence component of the dependence model
+#' @param ParamLengths Vector of three elements: the number of parameters in the marginal mean model, the number of parameters for the transition component of the dependence model, the number of parameters for the dependence component of the dependence model
 #' @param CondLike TRUE/FALSE. Set to TRUE from ascertainment corrected likelihood
 #' @param EmpiricalCheeseCalc TRUE/FALSE. Set to TRUE for robust standard errors estimation
 #' @param Q A scalar to denote the number of quadrature points used for GH numerical integration. Default is 10.

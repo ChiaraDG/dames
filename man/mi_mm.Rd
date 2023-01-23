@@ -57,7 +57,7 @@ used when \code{method} is set equal to direct, Default is set to NULL}
 \item{verbose}{An indicator of whether the steps of the maximization algorithm should be printed}
 }
 \value{
-This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matricies.
+This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matrices.
 }
 \description{
 Estimates regression parameters from a marginalized transition and latent variable model for scenarios where

@@ -24,7 +24,7 @@
 #'
 #' @importFrom dplyr n
 #'
-#' @return This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matricies.
+#' @return This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matrices.
 #' @export
 #'
 #' @examples

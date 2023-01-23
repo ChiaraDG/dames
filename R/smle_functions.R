@@ -399,7 +399,7 @@ pl.loglik <- function(X, Z = NULL, Bspline = NULL, n_sieve = NULL,
 #' @param verbose If \code{TRUE}, show estimated coefficients at each step of the EM algorithm. The default value is \code{FALSE}. This is an optional argument
 #' @param hnscale  Specifies the scale of the perturbation constant in the variance estimation. Default is set to 1. This is an optional argument
 #'
-#' @return This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matricies.
+#' @return This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matrices.
 #' @export
 #'
 #' @examples

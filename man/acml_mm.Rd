@@ -59,7 +59,7 @@ some and all stratum respectively. If not specified, the sampling probabilities 
 \item{return_args}{If TRUE returns the parameters used for the likelihood computation. Default is FALSE}
 }
 \value{
-This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matricies.
+This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matrices.
 }
 \description{
 Ascertainment Corrected Maximum Likelihood Estimator for the NSA design

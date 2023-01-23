@@ -23,7 +23,7 @@ LogLScoreCalc(
 
 \item{CondLike}{TRUE/FALSE. Set to TRUE from ascertainment corrected likelihood}
 
-\item{ParamLengths}{Vector of three elements: the number of parameters in the marginal mean model, the number of parameters for the transition component of the dependence model, the number of paramters for the dependence component of the dependence model}
+\item{ParamLengths}{Vector of three elements: the number of parameters in the marginal mean model, the number of parameters for the transition component of the dependence model, the number of parameters for the dependence component of the dependence model}
 
 \item{EmpiricalCheeseCalc}{TRUE/FALSE. Set to TRUE for robust standard errors estimation}
 

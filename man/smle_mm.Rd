@@ -60,7 +60,7 @@ smle_mm(
 \item{hnscale}{Specifies the scale of the perturbation constant in the variance estimation. Default is set to 1. This is an optional argument}
 }
 \value{
-This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matricies.
+This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matrices.
 }
 \description{
 Estimate the parameters of interest

@@ -23,7 +23,7 @@
 #' @param maxiter A scalar indicating the maximum number of iteration in the maximization algorithm. Default is 100
 #' @param return_args If TRUE returns the parameters used for the likelihood computation. Default is FALSE
 #'
-#' @return This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matricies.
+#' @return This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matrices.
 #' @export
 #'
 #' @examples
