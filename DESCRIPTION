@@ -30,7 +30,9 @@ RoxygenNote: 7.2.0
 Imports: stats, binaryMM, dplyr, magrittr, fastGHQuad, mitools, MASS
 Suggests: 
     rmarkdown,
-    knitr, 
+    knitr,
     tidyverse,
-    viridis
+    viridis,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3

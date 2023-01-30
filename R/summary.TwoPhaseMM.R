@@ -35,7 +35,7 @@ summary.TwoPhaseMM <-
       assoc.oo$X2     = with(assoc.oo, (estimate/rob.se)^2)
       assoc.oo$pX2    = with(assoc.oo, pchisq(X2, df=1,lower.tail=FALSE))
       names(assoc.oo) = c('Estimate','Robust SE','Chi Square','Pr(>Chi)')
-      warning('When performing a weighted likelihood analysis (by specifying the samp.probi argument), robust standard errors are reported. Model based standard errors will not be correct and should not be used.')
+      warning('When performing a weighted likelihood analysis (by specifying the weights argument), robust standard errors are reported. Model based standard errors will not be correct and should not be used.')
     }
 
     if(object$control["se_comp"] == 1) {

@@ -42,8 +42,8 @@ nsa_design <- function(Y, id, n.sample, data = NULL){
   if(!(id %in% names(data))){stop(paste("There is variable in the dataframe named", id))}
   if(!is.null(n.sample) & !is.vector(n.sample)){stop("n.sample needs to be a vector")}
 
-  if(is.null(n.sample) | length(n.sample) != 3){
-    warning("Number of people to be sampled was not provided or vector provided was not of length 3. Returning all the ids")
+  if(length(n.sample) != 3){
+    warning("Vector provided was not of length 3. Returning all the ids")
     out        = as.character(unique(data[,id]))
     prob.none  = prob.some <- prob.all  <- 1
     } else {
