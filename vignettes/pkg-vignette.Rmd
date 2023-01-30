@@ -325,12 +325,15 @@ In total, there are six main functions and one dataset in the package that avail
 
 | Name                  | Function and Outcome Description                                                             |
 |-----------------------|----------------------------------------------------------------------------------------------|
-| $\texttt{nsa_design}$ | Function to perform NSA designs. Returns a list with three elements: 1) vector of IDs to be sampled for expensive exposure ascertainment, 2) vector of sampling probabilities of the none, some and all strata respectively, and 3) vector of sample sizes of the none some and all strata respectively  |
-| $\texttt{res_design}$ | Function to perform RDS designs. Currently, sampling based on the mean, the absolute value of the mean or the variance of the residuals are implemented. Returns the vector of IDs to be sampled for expensive exposure ascertainment. |
-| $\texttt{acml_mm}$    | Ascertainment corrected maximum likelihood estimator. `acml_mm` can only be used for NSA designs. Returns the estimated coefficients, standard errors, and other summaries from the model fitting function. This is an object of class `TwoPhaseMM`. |
-| $\texttt{wee_mm}$     | Weighted likelihood estimator. `wee_mm` can only be used for NSA designs. Returns the estimated coefficients, standard errors, and other summaries from the model fitting function. This is an object of class `TwoPhaseMM`. |
-| $\texttt{smle_mm}$    | Sieve maximum likelihood estimator. `smle_mm` can be used for NSA and RDS designs. Returns the estimated coefficients, standard errors, and other summaries from the model fitting function. This is an object of class `TwoPhaseMM`. |
-| $\texttt{mi_mm}$    | Estimate the model coefficients using multiple imputation. Two approaches are implemented: direct and indirect. The direct approach can be used for NSA and RDS designs. The indirect approach can be used for NSA design only. Returns the estimated coefficients, standard errors, and other summaries from the model fitting function. This is an object of class `TwoPhaseMM`. |
+| $\texttt{nsa_design}$ | Function to implement any NSA design. Returns a list with four elements: 1) vector of subjects’ ids to be sampled for expensive exposure ascertainment, 2) vector of sampling probabilities of the none, some and all strata respectively, 3) vector of sample sizes of the none some and all strata respectively, 4) vector indicating whether a subject is in the none, some or all stratum  |
+| $\texttt{res_design}$ | Function to implement any RDS designs. Currently, one can sample based on extreme values of the mean, or absolute value of the mean, or variance of the residuals are. Returns the vector of subjects’ ids to be sampled for expensive exposure ascertainment. |
+| $\texttt{acml_mm}$    | Ascertainment corrected maximum likelihood estimator. `acml_mm` can only be used for NSA designs. Returns the estimated coefficients, standard errors, and other summaries from the model fitting function. |
+| $\texttt{wee_mm}$     | Weighted likelihood estimator. `wee_mm` can only be used if every subject has a non-zero probability of being sampled for expensive exposure ascertainment. Returns the estimated coefficients, standard errors, and other summaries from the model fitting function. |
+| $\texttt{smle_mm}$    | Sieve maximum likelihood estimator. `smle_mm` can be used for any design. Returns the estimated coefficients, standard errors, and other summaries from the model fitting function. |
+| $\texttt{mi_mm}$    | Multiple imputation. `mi_mm` allows users to implement two approaches: the direct multiple imputation and the indirect multiple imputation. The direct multiple imputation approach can be used for any design. The indirect
+multiple imputation approach can be used for NSA design only. Returns the
+estimated coefficients, standard errors, and other summaries from the model
+fitting function. |
 
 Note that not all analysis methods can be used for both designs. The graph below shows which analysis methods can be used for each design.
 
