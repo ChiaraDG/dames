@@ -7,12 +7,26 @@ install.packages("devtools")
 devtools::install_github("ChiaraDG/dames")
 ```
 
-## Designs
-
-There are two classes of designs implemented in the `dames` package: the none-some-all design (NSA) and the residual dependent sampling (RDS) design. Below is an example of how the function `nsa_design()` can be used. Here we want to sample 85 people from the none stratum, 100 people from the some stratum and 15 people. Note, since within each of the three strata independent Bernoulli sampling is performed, it is not unusual to have a total number of sampled subjects being different than 200.
+Once the package is installed, it can be loaded using:
 
 ```
+library(dames)
+```
+
+## Designs
+
+There are two classes of designs implemented in the `dames` package: the none-some-all design (NSA) and the residual dependent sampling (RDS) design. Below is an example of how the function `nsa_design()` can be used. Here we want to sample 85 people from the none stratum, 100 people from the some stratum and 15 people. Note, since within each of the three strata independent Bernoulli sampling is performed, it is not unusual to have a total number of sampled subjects being different than 200. Thus, in this README file we are going to set a seed for reproducibility.
+
+```
+set.seed(202311)
 design <- nsa_design(Y = "Y", id = "id", n.sample = c(85, 100, 15), data = exampledat)
+```
+
+Let us assume that the expensive covariate was not observed in those patients who were not selected by `nsa_design()`. To do so, we set the values of X to missing if subject ID is not in the `sampled.id` section of `nsa_design()`:
+
+```
+# Assume X is not collected for subjects not sampled
+exampledat$X <- ifelse(exampledat$id %in% design$sampled.id, exampledat$X, NA)
 ```
 
 ## Analysis Methods
@@ -36,73 +50,84 @@ summary(mod.acml)
 #> 
 #> Class:
 #> TwoPhaseMM
-#> 
+#>
 #> Call:
 #> acml_mm(mean.formula = Y ~ X + time + Z + X:time, t.formula = ~1, 
-#>     id = id, data = exampledat, samp.probs = design$sample.probs)
-#> 
+     id = id, data = exampledat, samp.probs = design$sample.probs)
+#>
 #> Information Criterion:
-#>       AIC        BIC     logLik   Deviance  
-#>  515.4883   535.0333  -251.7442   503.4883  
-#> 
+#>      AIC        BIC     logLik   Deviance  
+#> 285.6909   301.1392  -136.8454   273.6909  
+#>
 #> Marginal Mean Model Parameters:
-#>              Estimate  Model SE Chi Square Pr(>Chi)
-#> (Intercept) -2.100535  0.210039   100.0143  < 2e-16
-#> X            0.804936  0.350429     5.2762  0.02162
-#> time         0.179964  0.072248     6.2047  0.01274
-#> Z            0.267792  0.234088     1.3087  0.25263
-#> X:time       0.233289  0.135775     2.9522  0.08576
-#> 
+#>              Estimate  Model SE Chi Square  Pr(>Chi)
+#> (Intercept) -1.761520  0.278010    40.1470 2.356e-10
+#> X            0.625321  0.489145     1.6343   0.20111
+#> time         0.037619  0.102853     0.1338   0.71455
+#> Z            0.684270  0.338074     4.0967   0.04297
+#> X:time       0.270911  0.184323     2.1602   0.14163
+#>
 #> Dependence Model Parameters:
 #>                   Estimate Model SE Chi Square  Pr(>Chi)
-#> gamma:(Intercept)  1.98256  0.20576      92.84 < 2.2e-16
-#> 
-#> Number of clusters:             192 
+#> gamma:(Intercept)  1.87276  0.28595     42.891 5.787e-11
+#>
+#> Number of clusters:             97 
 #> Maximum cluster size:           6 
 #> Convergence status (nlm code):  1 
-#> Number of iterations:           31
+#> Number of iterations:           29
 ```
   
-- Weighted Maximum Likelihood Estimator. The method can be used regardless of the type of expensive exposure (i.e., nominal or continuous). The method can be implemented as long as every subject has a non-zero probability of being sampled; thus, it cannot be implemented for the RDS designs described in this R package.
+- Weighted Maximum Likelihood Estimator. The method can be used regardless of the type of expensive exposure (i.e., nominal or continuous). The method can be implemented as long as every subject has a non-zero probability of being sampled; thus, it cannot be implemented for the RDS designs current implemented in `dames`. The argument `weights` in the `wee_mm()` call needs to be a vector of length equal to the number of rows in the data.frame `data`
 
 ```
+# create the vector of sampling probabilities for each subject
+samp.probs <- ifelse(design$membership == "None", design$sample.probs[1], 
+                     ifelse(design$membership == "Some", design$sample.probs[2], 
+                            design$sample.probs[3]))
+# number of times each subject is observed
+time_i     <- exampledat %>% group_by(id) %>% summarise(mi = n()) %>% pull()
+# repeat the sampling probability for each subject based on the number
+# of times a subject is observed
+exampledat$samp.probs <- rep(samp.probs, time_i)
+samp.probs            <- exampledat[!is.na(exampledat$X),"samp.probs"]
+
 mod.wee    <- wee_mm(mean.formula = Y ~ X + time + Z + X:time,
                       t.formula = ~1,
                       id = id, weights = 1/samp.probs,
                       data = exampledat)
 # print the results
 summary(mod.wee)
-#> Warning in summary.TwoPhaseMM(mod.wee): When performing a weighted likelihood analysis (by specifying the
-#> samp.probi argument), robust standard errors are reported. Model based standard errors will not be correct and
-#> should not be used.
 #> 
 #> Class:
 #> TwoPhaseMM
-#> 
+#>
 #> Call:
 #> wee_mm(mean.formula = Y ~ X + time + Z + X:time, t.formula = ~1, 
 #>     id = id, data = exampledat, weights = 1/samp.probs)
-#> 
+#>
 #> Information Criterion:
 #>       AIC        BIC     logLik   Deviance  
-#> 1845.1127  1864.6576  -916.5563  1833.1127  
-#> 
+#>  945.5626   961.0109  -466.7813   933.5626  
+#>
 #> Marginal Mean Model Parameters:
 #>              Estimate Robust SE Chi Square  Pr(>Chi)
-#> (Intercept) -2.157193  0.211541   103.9898 < 2.2e-16
-#> X            0.904386  0.354652     6.5028  0.010770
-#> time         0.189655  0.071099     7.1154  0.007642
-#> Z            0.243668  0.249912     0.9507  0.329553
-#> X:time       0.205454  0.143771     2.0421  0.152994
-#> 
+#> (Intercept) -1.892993  0.300329    39.7286 2.918e-10
+#> X            0.636161  0.514212     1.5306    0.2160
+#> time         0.050214  0.102960     0.2379    0.6258
+#> Z            0.812207  0.387953     4.3830    0.0363
+#> X:time       0.262024  0.181104     2.0933    0.1479
+#>
 #> Dependence Model Parameters:
 #>                   Estimate Robust SE Chi Square  Pr(>Chi)
-#> gamma:(Intercept)  1.94548   0.21928     78.715 < 2.2e-16
-#> 
-#> Number of clusters:             192 
+#> gamma:(Intercept)  1.75827   0.30514     33.203 8.301e-09
+#>
+#> Number of clusters:             97 
 #> Maximum cluster size:           6 
 #> Convergence status (nlm code):  1 
-#> Number of iterations:           33
+#> Number of iterations:           31
+#> Warning message:
+#> In summary.TwoPhaseMM(mod.wee) :
+#>   When performing a weighted likelihood analysis (by specifying the weights argument), robust standard #> errors are reported. Model based standard errors will not be correct and should not be used.
 ```
 
 ### Full-Cohort Analyses
@@ -122,28 +147,29 @@ summary(mod.mi2)
 #> 
 #> Call:
 #> mi_mm(mean.formula = Y ~ X + time + Z + X:time, lv.formula = NULL, 
-#>     t.formula = ~1, id = "id", data = exampledat, sampled = "Sampled", 
-#>     X = "X", M = 5, marg.exp.formula = X ~ Z, method = "direct")
-#> 
+#>     t.formula = ~1, id = "id", data = exampledat, X = "X", M = 5, 
+#>     marg.exp.formula = X ~ Z, method = "direct")
+#>
 #> Information Criterion:
 #> [1]  NULL
-#> 
+#>
 #> Marginal Mean Model Parameters:
-#>              Estimate  Model SE Chi Square  Pr(>Chi)
-#> (Intercept) -2.217657  0.154648   205.6371 < 2.2e-16
-#> X            1.124937  0.309988    13.1694 0.0002846
-#> time         0.179099  0.052639    11.5765 0.0006679
-#> Z            0.278590  0.177457     2.4646 0.1164373
-#> X:time       0.169666  0.106359     2.5447 0.1106633
-#> 
+#>              Estimate  Model SE Chi Square Pr(>Chi)
+#> (Intercept) -2.112184  0.150236   197.6598  < 2e-16
+#> X            0.967794  0.513037     3.5585  0.05924
+#> time         0.165287  0.063028     6.8772  0.00873
+#> Z            0.278927  0.225904     1.5245  0.21694
+#> X:time       0.228862  0.196857     1.3516  0.24500
+#>
 #> Dependence Model Parameters:
 #>                   Estimate Model SE Chi Square  Pr(>Chi)
-#> gamma:(Intercept)  2.10573  0.14999      197.1 < 2.2e-16
-#> 
+#> gamma:(Intercept)  2.12042  0.14773     206.02 < 2.2e-16
+#>
 #> Number of clusters:             500 
 #> Maximum cluster size:           6 
 #> Convergence status (nlm code):  1 
 #> Number of iterations:           NA
+
 ```
 
 - Sieve Maximum Likelihood Estimator. The method can be used regardless of the type of expensive exposure (i.e., nominal or continuous) and/or study design.
