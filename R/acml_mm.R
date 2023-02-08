@@ -24,11 +24,13 @@
 #' @param return_args If TRUE returns the parameters used for the likelihood computation. Default is FALSE
 #'
 #' @return This function returns marginal mean (beta) and dependence parameters (alpha) along with the associated model and empirical covariance matrices.
+#'
 #' @export
 #'
 #' @examples
 #' \donttest{
 #' # perform the NSA design
+#' data("exampledat")
 #' design       <- nsa_design(Y = "Y", id = "id", n.sample = c(85, 100, 15), data = exampledat)
 #' # Assume X is not collected for subjects not sampled
 #' exampledat$X <- ifelse(exampledat$id %in% design$sampled.id, exampledat$X, NA)

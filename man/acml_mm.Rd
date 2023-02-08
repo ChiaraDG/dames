@@ -68,6 +68,7 @@ The function estimates the parameters of interest for the NSA design using the a
 \examples{
 \donttest{
 # perform the NSA design
+data("exampledat")
 design       <- nsa_design(Y = "Y", id = "id", n.sample = c(85, 100, 15), data = exampledat)
 # Assume X is not collected for subjects not sampled
 exampledat$X <- ifelse(exampledat$id \%in\% design$sampled.id, exampledat$X, NA)

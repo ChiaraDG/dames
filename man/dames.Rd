@@ -7,7 +7,7 @@
 \description{
 The package allows user to design different two-phase outcome dependent sampling studies for a binary longitudinal outcome.
 Together with the design the package provides different analysis methods to estimates the parameters of interest. Note that in each method,
-the analysis is carried out using marginalized transition and latent variable models
+the analysis is carried out using a marginalized transition and latent variable model
 }
 \references{
 Add the list of reference here
