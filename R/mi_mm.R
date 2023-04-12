@@ -78,7 +78,7 @@ mi_mm <- function(mean.formula, lv.formula = NULL, t.formula = NULL, id,
   if(method == "direct"){
 
     final =  DirectImputation(mean.formula =mean.formula,
-                            t.formula = t.formula,
+                            t.formula = t.formula, stepmax = stepmax,
                             lv.formula = lv.formula, id = id,
                             data = data, Q = Q, m = m, M = M,
                             X = X, marg.exp.formula = marg.exp.formula, verbose = verbose)
