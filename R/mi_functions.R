@@ -337,6 +337,7 @@ FitImputedData <- function(FIT, ImputedData, id, verbose=FALSE, iter.lim = 1000,
 #' @return The function returns the estimated coefficients and standard error from the direct imputation approach
 
 DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, sampled, X,
+                             stepmax = 1,
                              samp.probs, Q=10, M=5, marg.exp.formula, m = 20, verbose = FALSE){
 
   # Step 0: prepare for multiple imputation
@@ -353,7 +354,7 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
   mi     = c(table(id))
 
   # Step 1: on sampled subjects only fit mm
-  mstart = binaryMM::mm(mean.formula = mean.formula,
+  mstart = binaryMM::mm(mean.formula = mean.formula, step.max = stepmax,
                         t.formula = t.formula, lv.formula = lv.formula,
                         id = id, data = data, q = Q, verbose = verbose)
   thetas    = c(mstart$beta, mstart$alpha)
@@ -419,7 +420,7 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
       dat.final            = as.data.frame(dat.final)
 
       # Step 6: fit a MM to get a new estimate for theta
-      mod.imp = binaryMM::mm(mean.formula = mean.formula,
+      mod.imp = binaryMM::mm(mean.formula = mean.formula, step.max = stepmax,
                              t.formula = t.formula, lv.formula = lv.formula,
                              id = id, data = dat.final, q = Q, verbose = verbose)
       thetas    = c(mod.imp$beta, mod.imp$alpha)

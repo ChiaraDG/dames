@@ -12,6 +12,7 @@ DirectImputation(
   data,
   sampled,
   X,
+  stepmax = 1,
   samp.probs,
   Q = 10,
   M = 5,
