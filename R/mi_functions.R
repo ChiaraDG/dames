@@ -359,6 +359,7 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
                         id = id, data = data, q = Q, verbose = verbose)
   thetas    = c(mstart$beta, mstart$alpha)
   cov.theta = mstart$mod.cov
+  no.infos  = which(diag(mstart$mod.cov)>1e4)
 
   # store the results
   coefficients = variance = list()
@@ -367,7 +368,15 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
 
     for(i in 1:m){
       # Step 2: sample the coefficients to compute the offsets
-      new.theta = MASS::mvrnorm(n = 1, mu = thetas, Sigma = cov.theta)
+      if(length(no.infos) > 1){
+        new.theta = MASS::mvrnorm(n = 1, mu = thetas[-no.infos],
+                                  Sigma = cov.theta[-no.infos, -no.infos])
+        new.theta = append(new.theta, thetas[no.infos], after=no.infos-1)
+      } else {
+        new.theta = MASS::mvrnorm(n = 1, mu = thetas, Sigma = cov.theta)
+      }
+
+
 
       # Step 3: compute the offset using the new theta
       if(is.null(t.formula)){new.theta = append(new.theta, 0, after = (length(mstart$beta)))}
@@ -392,6 +401,7 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
                              ParamLengths = npar,
                              CondLike = FALSE, EmpiricalCheeseCalc = FALSE)
       offset.all  = rep(attr(LLSC_1,"LogLikeSubj") - attr(LLSC_0,"LogLikeSubj"), mi)
+      offset.all[is.na(offset.all)] = 0
       data$offset = offset.all
       dat.wide    = data %>% group_by(id) %>% sample_n(1)
 
@@ -424,7 +434,7 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
                              t.formula = t.formula, lv.formula = lv.formula,
                              id = id, data = dat.final, q = Q, verbose = verbose)
       thetas    = c(mod.imp$beta, mod.imp$alpha)
-      cov.theta = mod.imp$mod.cov
+      cov.theta = mod.imp$rob.cov
     }
 
     coefficients[[j]] = c(mod.imp$beta, mod.imp$alpha)
