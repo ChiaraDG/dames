@@ -20,7 +20,9 @@
 #' @param m A scalar giving the number of iterations within each imputation. The default is 5. The argument is only when \code{method} is set to direct.
 #' @param marg.exp.formula Marginal exposure model of the form: X ~ Z where Z are the inexpensive covariates in \code{data}. This is a required argument.
 #' @param method Character indication whether the indirect MI or the direct MI should be performed. Default is indirect. Note that indirect MI can only be used under an NSA design
+#' @param stepmax Maximum step size allowed for the minimization algorithm in nlm. Default is set to 1.
 #' @param verbose An indicator of whether the steps of the maximization algorithm should be printed
+#'
 #'
 #' @importFrom dplyr n
 #'
@@ -46,7 +48,7 @@
 mi_mm <- function(mean.formula, lv.formula = NULL, t.formula = NULL, id,
                   data, sampled = NULL, X,
                   samp.probs = NULL, maxiter=100, Q=10, M=5, m = 5, marg.exp.formula,
-                  method = "indirect", verbose=FALSE){
+                  method = "indirect", stepmax = 1, verbose=FALSE){
 
   if(is.null(samp.probs) & method == "indirect"){
     stop("If method is set to indirect, sampling probabilities need to be specified")}

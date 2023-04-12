@@ -19,6 +19,7 @@ mi_mm(
   m = 5,
   marg.exp.formula,
   method = "indirect",
+  stepmax = 1,
   verbose = FALSE
 )
 }
@@ -53,6 +54,8 @@ used when \code{method} is set equal to direct, Default is set to NULL}
 \item{marg.exp.formula}{Marginal exposure model of the form: X ~ Z where Z are the inexpensive covariates in \code{data}. This is a required argument.}
 
 \item{method}{Character indication whether the indirect MI or the direct MI should be performed. Default is indirect. Note that indirect MI can only be used under an NSA design}
+
+\item{stepmax}{Maximum step size allowed for the minimization algorithm in nlm. Default is set to 1.}
 
 \item{verbose}{An indicator of whether the steps of the maximization algorithm should be printed}
 }
