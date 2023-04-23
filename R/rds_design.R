@@ -1,4 +1,4 @@
-#' Residual-Based Design
+#' Residual-Based Sampling (RDS) Design
 #'
 #' Function to perform residual-based designs. The function requires specification of the column name with the outcome, the column name with the ID,
 #' the marginal mean model, at least one between the transition component or the latent component of the dependence model,
@@ -29,10 +29,10 @@
 #' @examples
 #' \donttest{
 #' data(exampledat)
-#' res_design(Y = "Y", id = "id", mean.formula = Y ~ Z + time, t.formula = ~1, lv.formula = NULL,
+#' rds_design(Y = "Y", id = "id", mean.formula = Y ~ Z + time, t.formula = ~1, lv.formula = NULL,
 #' n.sample = 200, statistic = "abs.mean", data = exampledat)
 #' }
-res_design <- function(Y, id,
+rds_design <- function(Y, id,
                        mean.formula, t.formula = NULL,
                        lv.formula = NULL, n.sample, statistic = "mean", data = NULL){
 

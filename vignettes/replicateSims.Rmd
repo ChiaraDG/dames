@@ -112,7 +112,7 @@ dat.nsa   <- dat.1a
 dat.nsa$X <- ifelse(dat.nsa$id %in% nsa$sampled.id, dat.nsa$X, NA)
 
 ###### RDS DESIGN ######
-rds <- dames::res_design(Y = "Y", id = "id", 
+rds <- dames::rds_design(Y = "Y", id = "id", 
                   mean.formula = Y ~ Z + time, t.formula = ~1, lv.formula = NULL,
                   n.sample = 600, statistic = "variance", data = dat.1a)
 # set as missing the value of the expensive exposure X for subjects not sampled

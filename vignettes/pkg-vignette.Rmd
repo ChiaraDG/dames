@@ -105,10 +105,10 @@ RDS designs can be performed with the function `res_design()`. The function requ
   
   - `sampled.id`: vector of subjects id to sample for expensive exposure ascertainment 
   
-Below is an example of how the function `res_design()` can be used. Here we want to sample 200 people with the highest absolute value of the mean of the residuals:
+Below is an example of how the function `rds_design()` can be used. Here we want to sample 200 people with the highest absolute value of the mean of the residuals:
   
 ```{r resdesign}
-res_design(Y = "Y", id = "id", 
+rds_design(Y = "Y", id = "id", 
            mean.formula = Y ~ Z + time, t.formula = ~1, lv.formula = NULL,
            n.sample = 200, statistic = "abs.mean", data = exampledat)
 ```
