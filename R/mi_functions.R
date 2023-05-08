@@ -340,6 +340,7 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
                              stepmax = 1,
                              samp.probs, Q=10, M=5, marg.exp.formula, m = 20, verbose = FALSE){
 
+
   # Step 0: prepare for multiple imputation
   DAT_Xe1 = DAT_Xe0 = data
   DAT_Xe1[,X] = 1
@@ -416,17 +417,17 @@ DirectImputation <- function(mean.formula, lv.formula, t.formula, id, data, samp
       # Create a temporary dataframe for non-sampled subjects in order to create the
       # model.matrix that is used to calculate marginal exposure odds
       DAT_Xe1$offset       = offset.all
-      tmp                  = DAT_Xe1 %>% group_by(id) %>% sample_n(1)
+      tmp                  = DAT_Xe1 %>% group_by(id) %>% sample_n(1) %>% as.data.frame
       mm_tmp               = model.matrix(marg.exp.formula, tmp)
       pred.prob            = expit(mm_tmp%*%new.alpha + tmp$offset)
-      data.imp             = dat.wide
+      data.imp             = dat.wide %>% as.data.frame
       imp.grp              = rbinom(nrow(data.imp), 1, pred.prob)
-      X.new                = ifelse(is.na(data.imp$X), imp.grp, data.imp$X)
+      X.new                = ifelse(is.na(data.imp[,X]), imp.grp, data.imp[,X])
       data.imp$X.new       = X.new
 
       data.imp             = subset(data.imp, select = c(id, X.new))
       dat.final            = merge(data.imp, data, by = "id")
-      dat.final$X          = ifelse(is.na(dat.final$X), dat.final$X.new, dat.final$X)
+      dat.final[,X]        = ifelse(is.na(dat.final[,X]), dat.final$X.new, dat.final[,X])
       dat.final            = as.data.frame(dat.final)
 
       # Step 6: fit a MM to get a new estimate for theta
